@@ -9,11 +9,11 @@
     "binding": "ASSETS"
   },
 
-  // Password hashing (PBKDF2, 100k iterations) needs more CPU than the 10 ms
-  // free-plan default. Paid plan: keep this. Free plan: see README notes.
-  "limits": {
-    "cpu_ms": 50
-  },
+  // NOTE: no `limits.cpu_ms` on purpose. Cloudflare rejects it on the Free plan
+  // ("CPU limits are not supported for the Free plan", code 100328). Password
+  // hashing is tuned to fit the Free plan's 10 ms budget - see PBKDF2_ITERATIONS
+  // in worker/auth.ts. On the Workers Paid plan you can add "limits": {"cpu_ms": 50}
+  // and raise PBKDF2_ITERATIONS back to 100_000.
 
   "observability": {
     "enabled": true
