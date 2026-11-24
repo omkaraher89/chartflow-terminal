@@ -1,0 +1,39 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "chartflow-terminal",
+  // Bundled Worker entry (npm run build:worker). It serves /api/* and the SPA assets.
+  "main": "dist-worker/worker.js",
+  "compatibility_date": "2026-11-23",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+
+  // Password hashing (PBKDF2, 100k iterations) needs more CPU than the 10 ms
+  // free-plan default. Paid plan: keep this. Free plan: see README notes.
+  "limits": {
+    "cpu_ms": 50
+  },
+
+  "observability": {
+    "enabled": true
+  },
+
+  // --- Database -------------------------------------------------------------
+  // 1. npx wrangler d1 create chartflow
+  // 2. paste the returned database_id below
+  // 3. npx wrangler d1 execute chartflow --remote --file=./sql/schema.sql
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "chartflow",
+      "database_id": "efe71b5b-8a79-44e6-b6e4-694f238220c0"
+    }
+  ]
+
+  // --- Secrets --------------------------------------------------------------
+  // LSE_API_KEY is not stored here. Add it with:
+  //   npx wrangler secret put LSE_API_KEY
+  // or in the dashboard: Workers & Pages -> chartflow-terminal -> Settings ->
+  // Variables and Secrets -> Add -> type "Secret".
+}
