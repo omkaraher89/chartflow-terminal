@@ -17,7 +17,14 @@ export interface D1DatabaseLike {
 
 export const SESSION_COOKIE = 'cf_session';
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
-const PBKDF2_ITERATIONS = 100_000;
+// PBKDF2-SHA256 costs roughly 0.17 us per iteration, and the Workers Free plan
+// allows only 10 ms of CPU per request (the paid plan allows 30 s, set by
+// `limits.cpu_ms` in wrangler.jsonc). 20 000 iterations keeps a sign-up or
+// sign-in around 4-6 ms, so auth works on both plans. The iteration count is
+// stored inside every hash (`pbkdf2$<iterations>$<salt>$<hash>`), so existing
+// passwords keep verifying if the value changes later - on a paid plan raise
+// this back to 100_000 and add `"limits": { "cpu_ms": 50 }` to wrangler.jsonc.
+const PBKDF2_ITERATIONS = 20_000;
 
 export interface SessionUser {
   id: string;
